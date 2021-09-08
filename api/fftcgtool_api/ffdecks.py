@@ -4,12 +4,11 @@ import time
 import zipfile
 
 import fftcgtool
-from flask import abort, Blueprint, current_app, send_file
+from flask import abort, Blueprint, current_app, send_file, request
 
 bp = Blueprint("ffdecks", __name__, url_prefix="/ffdecks")
 
-re_no_alpha = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
-re_no_num_comma = re.compile(r"[^0-9,]+", flags=re.UNICODE | re.IGNORECASE)
+RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
 
 
 def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.BytesIO:
@@ -31,19 +30,24 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
     return mem_file
 
 
-@bp.route("/<language>/<deck_ids>")
-def ffdecks(language: str, deck_ids: str):
+@bp.route("/<language>", methods=["POST"])
+def ffdecks(language: str):
     # sanitize parameters
-    language = re_no_alpha.sub("", language)
+    language = RE_NO_ALPHA.sub("", language)
     language = fftcgtool.Language(language)
-    deck_ids = re_no_num_comma.sub("", deck_ids)
-    deck_ids = deck_ids.split(",")
+
+    content = request.get_json()
+    deck_ids = [
+        deck_id
+        for deck_id in fftcgtool.TTSDeck.sanitized_ids(content["deck_ids"])
+        if deck_id is not None
+    ]
 
     # log sane parameters
-    current_app.logger.debug(f"{language = }, {deck_ids = }, path = {current_app.root_path}")
+    current_app.logger.debug(f"{language = }, {deck_ids = }")
 
     # create decks
-    decks = fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids)
+    decks = list(fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids))
     if not decks:
         abort(400)
 
