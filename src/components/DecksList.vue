@@ -73,9 +73,13 @@ export default {
   }),
 
   mounted() {
-    for (const deck_id of this.value) {
-      this.decks.push({ id: String(deck_id) });
+    if (Array.isArray(this.value)) {
+      for (const deck_id of this.value) {
+        this.decks.push({ id: String(deck_id) });
+      }
     }
+
+    this.$emit("input", this.current_deck_ids);
   },
 
   computed: {
