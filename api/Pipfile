@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 fftcgtool = {git = "https://github.com/ldericher/fftcgtool.git", ref = "develop"}
 flask = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.9"
