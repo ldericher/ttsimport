@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="toggle_mode()" text :icon="sm_and_down">
+  <v-btn @click="toggle_mode" text :icon="sm_and_down">
     <v-icon
       >{{ dark_mode ? "mdi-weather-sunny" : "mdi-weather-night" }}
     </v-icon>
