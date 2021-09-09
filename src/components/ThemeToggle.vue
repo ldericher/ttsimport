@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="toggle_mode" text :icon="sm_and_down">
+  <v-btn :icon="sm_and_down" @click="toggle_mode" tabindex="-1" text>
     <v-icon
       >{{ dark_mode ? "mdi-weather-sunny" : "mdi-weather-night" }}
     </v-icon>
@@ -13,15 +13,15 @@ export default {
 
   computed: {
     dark_mode: {
-      get: function () {
+      get() {
         return this.$vuetify.theme.dark;
       },
-      set: function (mode) {
+      set(mode) {
         this.$vuetify.theme.dark = mode;
       },
     },
 
-    sm_and_down: function () {
+    sm_and_down() {
       return this.$vuetify.breakpoint.smAndDown;
     },
   },

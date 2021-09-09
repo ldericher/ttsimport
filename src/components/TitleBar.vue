@@ -20,7 +20,7 @@ export default {
   },
 
   computed: {
-    page_title: function () {
+    page_title() {
       return VueConfig.pages.index.title;
     },
   },

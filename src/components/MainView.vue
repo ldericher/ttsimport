@@ -8,19 +8,19 @@
         height="200"
       />
 
-      <decks-list />
+      <decks />
     </v-container>
   </v-main>
 </template>
 
 <script>
-import DecksList from "./DecksList.vue";
+import Decks from "./Decks.vue";
 
 export default {
   name: "MainView",
 
   components: {
-    DecksList,
+    Decks,
   },
 
   mounted() {
