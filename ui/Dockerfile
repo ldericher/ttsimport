@@ -1,4 +1,4 @@
-FROM node:lts-alpine as build
+FROM node:lts-alpine AS build
 
 # some dir for our code
 WORKDIR /app

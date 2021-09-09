@@ -1,0 +1,19 @@
+version: "2.3"
+
+services: 
+  ttsimport_api:
+    build: 
+      context: ./api
+    image: ldericher/ttsimport:api
+    restart: unless-stopped
+
+  ttsimport_ui:
+    build: 
+      context: ./ui
+      target: production
+    image: ldericher/ttsimport:ui
+    restart: unless-stopped
+    volumes: 
+      - "./ui/production/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro"
+    ports:
+      - "8888:80"
