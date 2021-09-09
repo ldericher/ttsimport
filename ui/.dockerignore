@@ -1,11 +1,15 @@
+.git/
+node_modules/
+__pycache__/
 .DS_Store
-node_modules
-__pycache__
 
 /.devcontainer
 /api
 /dist
+
 /Dockerfile
+/.gitignore
+/.dockerignore
 
 .env.local
 .env.*.local
