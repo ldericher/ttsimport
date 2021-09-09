@@ -8,18 +8,18 @@ FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-RUN set -ex; \
-  export DEBIAN_FRONTEND=noninteractive; \
-  \
-  # python 3.9
-  apt-get update; apt-get -y install --no-install-recommends \
-  python3.9 \
-  python3-pip \
-  ; \
-  rm -rf /var/lib/apt/lists/*; \
-  \
-  # fftcgtool
-  python3.9 -m pip install "git+https://github.com/ldericher/fftcgtool";
+# RUN set -ex; \
+#   export DEBIAN_FRONTEND=noninteractive; \
+#   \
+#   # python 3.9
+#   apt-get update; apt-get -y install --no-install-recommends \
+#   python3.9 \
+#   python3-pip \
+#   ; \
+#   rm -rf /var/lib/apt/lists/*; \
+#   \
+#   # fftcgtool
+#   python3.9 -m pip install "git+https://github.com/ldericher/fftcgtool";
 
 # [Optional] Uncomment if you want to install an additional version of node using nvm
 # ARG EXTRA_NODE_VERSION=10
