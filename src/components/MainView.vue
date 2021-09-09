@@ -22,15 +22,5 @@ export default {
   components: {
     Decks,
   },
-
-  mounted() {
-    this.$http
-      .get("https://api.coindesk.com/v1/bpi/currentprice.json")
-      .then((res) => (this.info = res));
-  },
-
-  data: () => ({
-    info: "",
-  }),
 };
 </script>
