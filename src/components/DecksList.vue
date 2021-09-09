@@ -35,8 +35,8 @@
           <v-text-field
             placeholder="Paste FF Decks Link or ID"
             hint="e.g. https://ffdecks.com/deck/6272690272862208 or 6272690272862208"
-            v-model="deck_id"
-            :rules="deck_id_rules"
+            v-model="new_deck_id"
+            :rules="new_deck_id_rules"
             dense
             filled
           >
@@ -56,11 +56,15 @@
 export default {
   name: "DecksList",
 
+  props: {
+    value: Array,
+  },
+
   data: () => ({
-    decks: [{ id: 6272690272862208 }],
+    decks: [],
     valid: false,
-    deck_id: "",
-    deck_id_rules: [
+    new_deck_id: "",
+    new_deck_id_rules: [
       (v) =>
         !v ||
         /^((https?:\/\/)?ffdecks\.com(\/+api)?\/+deck\/+)?([0-9]+)/.test(v) ||
@@ -68,17 +72,39 @@ export default {
     ],
   }),
 
+  mounted() {
+    for (const deck_id of this.value) {
+      this.decks.push({ id: String(deck_id) });
+    }
+  },
+
+  computed: {
+    current_deck_ids() {
+      var res = [];
+
+      for (const deck of this.decks) {
+        res.push(deck.id);
+      }
+
+      return res;
+    },
+  },
+
   methods: {
     import_deck() {
-      if (this.valid && this.deck_id) {
-        this.decks.push({ id: this.deck_id });
+      if (this.valid && this.new_deck_id) {
+        this.decks.push({ id: String(this.new_deck_id) });
         this.$refs.form.reset();
+
+        this.$emit("input", this.current_deck_ids);
       }
     },
 
     delete_deck(index) {
       if (index < this.decks.length) {
         this.decks.splice(index, 1);
+
+        this.$emit("input", this.current_deck_ids);
       }
     },
   },

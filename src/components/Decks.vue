@@ -1,8 +1,8 @@
 <template>
   <v-card flat class="mx-auto" max-width="1024">
     <v-card-text>
-      <decks-list />
-      <language-select />
+      <decks-list v-model="deck_ids" />
+      <language-select v-model="language" />
     </v-card-text>
 
     <v-card-actions>
@@ -24,5 +24,10 @@ export default {
     DecksList,
     LanguageSelect,
   },
+
+  data: () => ({
+    language: "",
+    deck_ids: ["6272690272862208"],
+  }),
 };
 </script>
