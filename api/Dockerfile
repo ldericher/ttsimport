@@ -16,7 +16,7 @@ RUN set -ex; \
     ; \
     # Twistd Webserver
     pip3 --no-cache-dir install \
-        Twisted \
+        twisted \
     ;
 
 COPY . /usr/src/fftcgtool_api
