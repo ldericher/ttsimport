@@ -3,6 +3,7 @@ import logging
 import re
 import time
 import zipfile
+from typing import Iterator
 
 import fftcgtool
 from fastapi import APIRouter, status
@@ -34,13 +35,49 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
     return mem_file
 
 
-class GetDecksBody(BaseModel):
+class DecksBody(BaseModel):
     deck_ids: list[str]
+
+    @property
+    def sanitized_ids(self) -> Iterator[str]:
+        return (
+            deck_id
+            for deck_id in fftcgtool.FFDecks.sanitized_ids(self.deck_ids)
+            if deck_id is not None
+        )
+
+
+@router.post("/check")
+def check_decks(decks_body: DecksBody):
+    return {
+        deck_id: fftcgtool.FFDecks.get_deck_data(deck_id) is not None
+        for deck_id in decks_body.sanitized_ids
+    }
+
+
+@router.post("/names")
+def get_deck_names(decks_body: DecksBody):
+    return {
+        deck_id: deck_data["name"]
+        if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
+        else None
+        for deck_id in decks_body.sanitized_ids
+    }
+
+
+@router.post("/data")
+def get_deck_data(decks_body: DecksBody):
+    return {
+        deck_id: deck_data
+        if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
+        else None
+        for deck_id in decks_body.sanitized_ids
+    }
 
 
 @router.post("/{language}")
-async def get_decks(language: str, get_decks_body: GetDecksBody):
-    logger = logging.getLogger("uvicorn")
+async def get_decks(language: str, decks_body: DecksBody):
+    logger = logging.getLogger(__name__)
 
     # sanitize parameters
     language = RE_NO_ALPHA.sub("", language)
@@ -48,8 +85,7 @@ async def get_decks(language: str, get_decks_body: GetDecksBody):
 
     deck_ids = [
         deck_id
-        for deck_id in fftcgtool.FFDecks.sanitized_ids(get_decks_body.deck_ids)
-        if deck_id is not None
+        for deck_id in decks_body.sanitized_ids
     ]
 
     # log sane parameters
