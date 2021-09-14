@@ -9,6 +9,7 @@ verify_ssl = true
 fftcgtool = {git = "https://github.com/ldericher/fftcgtool.git"}
 fastapi = "*"
 uvicorn = "*"
+aiofiles = "*"
 
 [requires]
 python_version = "3.9"

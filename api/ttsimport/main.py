@@ -6,6 +6,7 @@ import fftcgtool
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .config import settings, log_config
 from .ffdecks import router as ffdecks_router
@@ -34,9 +35,19 @@ app.include_router(ffdecks_router)
 
 @app.on_event("startup")
 def main():
-    # Allow CORS in debug mode
-    # production mode will have same origin
-    if not settings.production_mode:
+    if settings.production_mode:
+        # Mount frontend in production mode
+        app.mount(
+            path="/",
+            app=StaticFiles(
+                directory="/html",
+                html=True,
+            ),
+            name="frontend",
+        )
+
+    else:
+        # Allow CORS in debug mode
         app.add_middleware(
             CORSMiddleware,
             allow_origins=[
