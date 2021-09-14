@@ -45,6 +45,7 @@ class LogConfig(BaseModel):
     }
     loggers = {
         "ttsimport": {"handlers": ["default"], "level": LOG_LEVEL},
+        "fftcgtool": {"handlers": ["default"], "level": LOG_LEVEL},
     }
 
 
