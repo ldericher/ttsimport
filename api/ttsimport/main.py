@@ -2,8 +2,8 @@ import os
 
 import fftcgtool
 import uvicorn
+import logging
 from fastapi import FastAPI
-from fastapi.logger import logger
 from fastapi.middleware.cors import CORSMiddleware
 
 from ttsimport.config import settings
@@ -11,13 +11,25 @@ from .ffdecks import router as ffdecks_router
 
 
 def main() -> FastAPI:
-    logger.warning(settings)
+    logging.basicConfig(
+        level=logging.DEBUG if not settings.production_mode else logging.INFO,
+        format="%(levelname)s in %(name)s (#%(process)d): %(message)s",
+    )
+
+    logger = logging.getLogger(__name__)
+    logger.info(settings)
+
+    here = os.path.dirname(os.path.realpath(__file__))
 
     # create app
     app = FastAPI(
         title="TTSImport API",
-        description="",
+        description="This API provides `fftcgtool` over HTTP.",
         version="0.1",
+        contact={
+            "name": "LDericher",
+            "email": "LDericher@GMX.de",
+        },
         license_info={
             "name": "GPLv3",
             "url": "https://www.gnu.org/licenses/gpl-3.0.en.html",
@@ -43,8 +55,7 @@ def main() -> FastAPI:
         )
 
     # card db
-    dbpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "carddb.zip")
-    fftcgtool.CardDB(dbpath)
+    fftcgtool.CardDB(os.path.join(here, "carddb.zip"))
 
     return app
 

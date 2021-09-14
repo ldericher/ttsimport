@@ -14,6 +14,8 @@ router = APIRouter(prefix="/ffdecks")
 
 
 def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.BytesIO:
+    logger = logging.getLogger(__name__)
+
     # create an in-memory file
     mem_file = io.BytesIO()
 
@@ -24,7 +26,7 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
             data = zipfile.ZipInfo(deck.file_name)
             data.date_time = time.localtime(time.time())[:6]
 
-            logging.info(f"Saving Deck {deck!r}")
+            logger.info(f"Saving Deck {deck!r}")
             zip_file.writestr(deck.file_name, deck.get_json(language))
 
     # rewind in-memory file before returning
@@ -38,6 +40,8 @@ class GetDecksBody(BaseModel):
 
 @router.post("/{language}")
 async def get_decks(language: str, get_decks_body: GetDecksBody):
+    logger = logging.getLogger("uvicorn")
+
     # sanitize parameters
     language = RE_NO_ALPHA.sub("", language)
     language = fftcgtool.Language(language)
@@ -49,7 +53,7 @@ async def get_decks(language: str, get_decks_body: GetDecksBody):
     ]
 
     # log sane parameters
-    logging.info(f"{language = }, {deck_ids = }")
+    logger.info(f"{language = }, {deck_ids = }")
 
     # create decks
     if not (decks := fftcgtool.FFDecks(deck_ids)):
