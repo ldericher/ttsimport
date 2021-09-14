@@ -17,6 +17,6 @@ def create_app() -> Flask:
 
     app.register_blueprint(ffdecks_bp)
 
-    fftcgtool.RWCardDB(os.path.join(app.root_path, "carddb.zip"))
+    fftcgtool.CardDB(os.path.join(app.root_path, "carddb.zip"))
 
     return app

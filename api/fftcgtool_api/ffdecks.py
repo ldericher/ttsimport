@@ -39,7 +39,7 @@ def ffdecks(language: str):
     content = request.get_json()
     deck_ids = [
         deck_id
-        for deck_id in fftcgtool.TTSDeck.sanitized_ids(content["deck_ids"])
+        for deck_id in fftcgtool.FFDecks.sanitized_ids(content["deck_ids"])
         if deck_id is not None
     ]
 
@@ -47,7 +47,7 @@ def ffdecks(language: str):
     current_app.logger.debug(f"{language = }, {deck_ids = }")
 
     # create decks
-    decks = list(fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids))
+    decks = fftcgtool.FFDecks(deck_ids)
     if not decks:
         abort(400)
 
