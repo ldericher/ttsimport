@@ -3,7 +3,7 @@ import logging
 import re
 import time
 import zipfile
-from typing import Iterator
+from typing import Iterator, Optional
 
 import fftcgtool
 from fastapi import APIRouter, status
@@ -36,6 +36,7 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
 
 
 class DecksBody(BaseModel):
+    language: Optional[str]
     deck_ids: list[str]
 
     @property
@@ -47,52 +48,45 @@ class DecksBody(BaseModel):
         )
 
 
-@router.post("/check")
-def check_decks(decks_body: DecksBody):
-    return {
-        deck_id: fftcgtool.FFDecks.get_deck_data(deck_id) is not None
-        for deck_id in decks_body.sanitized_ids
-    }
+class CheckResponse(BaseModel):
+    deck_id: str
+    exists: bool
 
 
-@router.post("/names")
-def get_deck_names(decks_body: DecksBody):
-    return {
-        deck_id: deck_data["name"]
+@router.post("/check", response_model=list[CheckResponse])
+async def check_decks(decks_body: DecksBody):
+    return ({
+        "deck_id": deck_id,
+        "exists": fftcgtool.FFDecks.get_deck_data(deck_id) is not None
+    } for deck_id in decks_body.sanitized_ids)
+
+
+class SummaryResponse(BaseModel):
+    deck_id: str
+    name: str
+    card_count: int
+
+
+@router.post("/summaries", response_model=list[SummaryResponse])
+async def get_deck_names(decks_body: DecksBody):
+    return (
+        {
+            "deck_id": deck_data["description"],
+            "name": deck_data["name"],
+            "card_count": sum(card["count"] for card in deck_data["cards"]),
+        } for deck_id in decks_body.sanitized_ids
         if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
-        else None
-        for deck_id in decks_body.sanitized_ids
-    }
+    )
 
 
-@router.post("/data")
-def get_deck_data(decks_body: DecksBody):
-    return {
-        deck_id: deck_data
-        if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
-        else None
-        for deck_id in decks_body.sanitized_ids
-    }
-
-
-@router.post("/{language}")
-async def get_decks(language: str, decks_body: DecksBody):
-    logger = logging.getLogger(__name__)
-
-    # sanitize parameters
-    language = RE_NO_ALPHA.sub("", language)
+@router.post("/deck")
+async def get_decks(decks_body: DecksBody):
+    # sanitize language parameter
+    language = RE_NO_ALPHA.sub("", decks_body.language)
     language = fftcgtool.Language(language)
 
-    deck_ids = [
-        deck_id
-        for deck_id in decks_body.sanitized_ids
-    ]
-
-    # log sane parameters
-    logger.info(f"{language = }, {deck_ids = }")
-
     # create decks
-    if not (decks := fftcgtool.FFDecks(deck_ids)):
+    if not (decks := fftcgtool.FFDecks(decks_body.sanitized_ids)):
         return JSONResponse(
             None,
             status_code=status.HTTP_400_BAD_REQUEST,
