@@ -35,13 +35,13 @@ app.include_router(ffdecks_router)
 @app.on_event("startup")
 def main():
     # Allow CORS in debug mode
-    # production mode will have a reverse proxy
+    # production mode will have same origin
     if not settings.production_mode:
         app.add_middleware(
             CORSMiddleware,
             allow_origins=[
                 "http://localhost",
-                "https://localhost",
+                "http://localhost:8000",
             ],
             allow_credentials=True,
             allow_methods=["*"],
@@ -62,6 +62,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "ttsimport.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=5000,
         reload=True,
     )
