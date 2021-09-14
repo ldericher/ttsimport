@@ -13,18 +13,14 @@ RUN set -ex; \
         g++ \
         jpeg-dev \
         zlib-dev \
-    ; \
-    # Twistd Webserver
-    pip3 --no-cache-dir install \
-        twisted \
     ;
 
-COPY . /usr/src/fftcgtool_api
+COPY . /usr/src/ttsimport
 
 RUN set -ex; \
     pip3 --no-cache-dir install --use-feature=in-tree-build \
-        /usr/src/fftcgtool_api \
+        /usr/src/ttsimport \
     ;
 
-EXPOSE 8080
-CMD [ "twistd", "-n", "web", "--listen", "tcp:8080", "--wsgi", "fftcgtool_api.wsgi.app" ]
+EXPOSE 8000
+CMD [ "uvicorn", "--host", "0.0.0.0", "--port", "8000", "--factory", "ttsimport.main:main" ]

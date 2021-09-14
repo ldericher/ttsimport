@@ -1,14 +1,16 @@
 import io
+import logging
 import re
 import time
 import zipfile
 
 import fftcgtool
-from flask import abort, Blueprint, current_app, send_file, request
-
-bp = Blueprint("ffdecks", __name__, url_prefix="/ffdecks")
+from fastapi import APIRouter, status
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel
 
 RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
+router = APIRouter(prefix="/ffdecks")
 
 
 def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.BytesIO:
@@ -22,7 +24,7 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
             data = zipfile.ZipInfo(deck.file_name)
             data.date_time = time.localtime(time.time())[:6]
 
-            current_app.logger.debug(f"Saving Deck {deck!r}")
+            logging.info(f"Saving Deck {deck!r}")
             zip_file.writestr(deck.file_name, deck.get_json(language))
 
     # rewind in-memory file before returning
@@ -30,27 +32,35 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
     return mem_file
 
 
-@bp.route("/<language>", methods=["POST"])
-def ffdecks(language: str):
+class GetDecksBody(BaseModel):
+    deck_ids: list[str]
+
+
+@router.post("/{language}")
+async def get_decks(language: str, get_decks_body: GetDecksBody):
     # sanitize parameters
     language = RE_NO_ALPHA.sub("", language)
     language = fftcgtool.Language(language)
 
-    content = request.get_json()
     deck_ids = [
         deck_id
-        for deck_id in fftcgtool.FFDecks.sanitized_ids(content["deck_ids"])
+        for deck_id in fftcgtool.FFDecks.sanitized_ids(get_decks_body.deck_ids)
         if deck_id is not None
     ]
 
     # log sane parameters
-    current_app.logger.debug(f"{language = }, {deck_ids = }")
+    logging.info(f"{language = }, {deck_ids = }")
 
     # create decks
-    decks = fftcgtool.FFDecks(deck_ids)
-    if not decks:
-        abort(400)
+    if not (decks := fftcgtool.FFDecks(deck_ids)):
+        return JSONResponse(
+            None,
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
 
-    return send_file(
-        pack(decks, language), download_name='decks.zip', as_attachment=True
+    return StreamingResponse(
+        pack(decks, language),
+        status_code=status.HTTP_200_OK,
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=decks.zip"},
     )
