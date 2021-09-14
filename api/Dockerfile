@@ -15,6 +15,8 @@ RUN set -ex; \
         zlib-dev \
     ;
 
+ENV PRODUCTION_MODE="True"
+
 COPY . /usr/src/ttsimport
 
 RUN set -ex; \
