@@ -17,7 +17,7 @@ dictConfig(log_config.dict())
 app = FastAPI(
     title="TTSImport API",
     description="This API provides `fftcgtool` over HTTP.",
-    version="0.2",
+    version="0.3.0",
     contact={
         "name": "LDericher",
         "email": "LDericher@GMX.de",

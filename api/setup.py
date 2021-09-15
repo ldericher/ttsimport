@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ttsimport",
-    version="0.2",
+    version="0.3.0",
     packages=find_packages(),
     author="LDericher",
     author_email="ldericher@gmx.de",
