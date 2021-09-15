@@ -1,0 +1,26 @@
+# commonly found
+**/.git
+**/.idea
+**/.vscode
+**/.DS_Store
+**/.devcontainer
+**/Dockerfile
+**/.gitignore
+**/.dockerignore
+
+# found in python and JS dirs
+**/__pycache__
+**/node_modules
+
+# local env files
+**/.env.local
+**/.env.*.local
+
+# log files
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# special cases
+ui/dist

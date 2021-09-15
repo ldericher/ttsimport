@@ -2,7 +2,7 @@
 
 This API provides `fftcgtool` capabilities over HTTP.
 
-# Usage
+## Usage
 
 Just run the `main` submodule as a script:
 
@@ -19,7 +19,7 @@ Runtime configuration of the API is done using environment variables.
 - `DOCS_URL` – Where the API will publish its documentation/Swagger UI (string, default `"/docs"`)
 - `REDOC_URL` – Where the API will publish its documentation/Redoc UI (string, default `"/redoc"`)
 
-# Installation
+## Installation
 
 You can install `ttsimport` if you have at least python version `3.9` with `pip` installed. To test,
 run `python --version` or similar.
