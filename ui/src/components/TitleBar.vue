@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app color="primary" dark>
-    <v-toolbar-title>{{ page_title }}</v-toolbar-title>
+    <v-toolbar-title class="noselect">{{ page_title }}</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -26,3 +26,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.noselect {
+  user-select: none;
+}
+</style>
