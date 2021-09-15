@@ -51,7 +51,7 @@ export default {
           url: this.api_baseurl + "/ffdecks/deck",
           method: "POST",
           responseType: "blob",
-          data: { language: "en", deck_ids: this.deck_ids },
+          data: { language: this.language, deck_ids: this.deck_ids },
         })
           .then((response) => {
             // save response

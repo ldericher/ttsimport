@@ -26,7 +26,7 @@ export default {
       { value: "fr", text: "French" },
       { value: "de", text: "German" },
       { value: "it", text: "Italian" },
-      { value: "ja", text: "Japanese" },
+      { value: "ja", text: "Japanese (tooltips only)" },
       { value: "es", text: "Spanish" },
     ],
   }),
