@@ -4,7 +4,7 @@ from logging.config import dictConfig
 
 import fftcgtool
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -70,6 +70,13 @@ def main():
     fftcgtool.CardDB(os.path.join(here, "carddb.zip"))
 
     return app
+
+
+@app.middleware("http")
+async def add_cache_control_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "max-age=86400"
+    return response
 
 
 if __name__ == "__main__":
