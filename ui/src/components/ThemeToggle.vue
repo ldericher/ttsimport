@@ -1,15 +1,20 @@
 <template>
-  <v-btn :icon="sm_and_down" @click="toggle_mode" tabindex="-1" text>
-    <v-icon
-      >{{ dark_mode ? "mdi-weather-sunny" : "mdi-weather-night" }}
-    </v-icon>
-    <span class="hidden-sm-and-down ml-2">Toggle Theme</span>
-  </v-btn>
+  <icon-text-button
+    :icon="dark_mode ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+    text="Toggle Theme"
+    @click="toggle_mode"
+  />
 </template>
 
 <script>
+import IconTextButton from "./IconTextButton.vue";
+
 export default {
   name: "ThemeToggle",
+
+  components: {
+    IconTextButton,
+  },
 
   computed: {
     dark_mode: {
@@ -19,10 +24,6 @@ export default {
       set(mode) {
         this.$vuetify.theme.dark = mode;
       },
-    },
-
-    sm_and_down() {
-      return this.$vuetify.breakpoint.smAndDown;
     },
   },
 
