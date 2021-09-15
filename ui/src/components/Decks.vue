@@ -39,7 +39,7 @@ export default {
           console.warn("Unexpected NODE_ENV value");
         }
 
-        return "//" + window.location.hostname + ":5000";
+        return "//" + window.location.hostname + ":5000/api";
       }
     },
   },
@@ -48,10 +48,10 @@ export default {
     download() {
       if (this.deck_ids.length > 0) {
         this.$http({
-          url: this.api_baseurl + "/ffdecks/en", //" + this.language,
+          url: this.api_baseurl + "/ffdecks/deck",
           method: "POST",
           responseType: "blob",
-          data: { deck_ids: this.deck_ids },
+          data: { language: "en", deck_ids: this.deck_ids },
         })
           .then((response) => {
             // save response

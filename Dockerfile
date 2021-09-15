@@ -37,13 +37,12 @@ ENV \
   PRODUCTION_MODE="True" \
   APP_MODULE="ttsimport.main:app"
 
-# copy static html
-COPY --from=build-ui /app/dist /html
-# copy API code
-COPY api /usr/src/ttsimport
-
 # install API
+COPY api /usr/src/ttsimport
 RUN set -ex; \
   pip3 --no-cache-dir install --use-feature=in-tree-build \
   /usr/src/ttsimport \
   ;
+
+# install UI
+COPY --from=build-ui /app/dist /html

@@ -30,7 +30,10 @@ app = FastAPI(
     docs_url=settings.docs_url if not settings.production_mode else None,
     redoc_url=settings.redoc_url if not settings.production_mode else None,
 )
-app.include_router(ffdecks_router)
+app.include_router(
+    router=ffdecks_router,
+    prefix="/api",
+)
 
 
 @app.on_event("startup")

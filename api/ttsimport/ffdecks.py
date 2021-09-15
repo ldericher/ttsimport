@@ -55,10 +55,12 @@ class CheckResponse(BaseModel):
 
 @router.post("/check", response_model=list[CheckResponse])
 async def check_decks(decks_body: DecksBody):
-    return ({
-        "deck_id": deck_id,
-        "exists": fftcgtool.FFDecks.get_deck_data(deck_id) is not None
-    } for deck_id in decks_body.sanitized_ids)
+    return (
+        {
+            "deck_id": deck_id,
+            "exists": fftcgtool.FFDecks.get_deck_data(deck_id) is not None
+        } for deck_id in decks_body.sanitized_ids
+    )
 
 
 class SummaryResponse(BaseModel):
