@@ -6,8 +6,8 @@ import zipfile
 from typing import Iterator, Optional
 
 import fftcgtool
-from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import APIRouter, status, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
@@ -89,9 +89,9 @@ async def get_decks(decks_body: DecksBody):
 
     # create decks
     if not (decks := fftcgtool.FFDecks(decks_body.sanitized_ids)):
-        return JSONResponse(
-            None,
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No valid decks received."
         )
 
     return StreamingResponse(
