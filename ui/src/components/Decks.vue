@@ -30,25 +30,11 @@ export default {
     deck_ids: null,
   }),
 
-  computed: {
-    api_baseurl() {
-      if (process.env.NODE_ENV === "production") {
-        return "//" + window.location.host + "/api";
-      } else {
-        if (process.env.NODE_ENV !== "development") {
-          console.warn("Unexpected NODE_ENV value");
-        }
-
-        return "//" + window.location.hostname + ":5000/api";
-      }
-    },
-  },
-
   methods: {
     download() {
       if (this.deck_ids.length > 0) {
         this.$http({
-          url: this.api_baseurl + "/ffdecks/deck",
+          url: this.ttsimport_api_baseurl + "/ffdecks/deck",
           method: "POST",
           responseType: "blob",
           data: { language: this.language, deck_ids: this.deck_ids },
