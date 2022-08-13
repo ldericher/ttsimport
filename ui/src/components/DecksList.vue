@@ -1,44 +1,15 @@
 <template>
   <v-list flat>
-    <template v-for="(deck, idx) in decks">
-      <v-list-item :key="idx">
-        <v-list-item-avatar>
-          <v-icon color="primary">mdi-cards</v-icon>
-        </v-list-item-avatar>
-
-        <v-list-item-content class="noselect">
-          {{ deck.name }} ({{ deck.card_count }} Cards)
-        </v-list-item-content>
-
-        <v-tooltip left>
-          <template v-slot:activator="{ on, attrs }">
-            <v-list-item-action
-              v-if="deck.card_count != 50"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon color="warning">mdi-flash-alert</v-icon>
-            </v-list-item-action>
-          </template>
-          <span>Non-Standard deck size!</span>
-        </v-tooltip>
-
-        <v-list-item-action>
-          <v-btn @click="delete_deck(idx)" color="error" icon outlined>
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
+    <template v-for="(deck_id, idx) in deck_ids">
+      <deck :key="idx" :deck_id="deck_id" />
 
       <v-divider
-        v-if="idx != decks.length - 1"
+        v-if="idx != deck_ids.length - 1"
         :key="idx + '_div'"
         class="my-2"
         role="presentation"
       />
     </template>
-
-    <v-progress-linear v-if="loading" indeterminate />
 
     <v-form ref="form" @submit.prevent="add_deck" v-model="valid">
       <v-list-item>
@@ -70,17 +41,22 @@
 </template>
 
 <script>
+import Deck from "./Deck.vue";
+
 export default {
   name: "DecksList",
+
+  components: {
+    Deck,
+  },
 
   props: {
     value: Array,
   },
 
   data: () => ({
-    decks: [],
+    deck_ids: ["1234", "5678"],
     valid: false,
-    loading: false,
     new_deck_id: "",
     new_deck_id_rules: [
       (v) =>
@@ -97,19 +73,7 @@ export default {
       }
     }
 
-    this.$emit("input", this.current_deck_ids);
-  },
-
-  computed: {
-    current_deck_ids() {
-      var res = [];
-
-      for (const deck of this.decks) {
-        res.push(deck.id);
-      }
-
-      return res;
-    },
+    this.$emit("input", this.deck_ids);
   },
 
   methods: {
@@ -118,32 +82,7 @@ export default {
         const new_deck_id = this.new_deck_id;
         this.$refs.form.reset();
 
-        // start loading
-        this.loading = true;
-
-        this.$http({
-          url: this.ttsimport_api_baseurl + "/ffdecks/summaries",
-          method: "POST",
-          data: { deck_ids: [new_deck_id] },
-        })
-          .then((response) => {
-            if (response.data.length > 0) {
-              const data = response.data[0];
-
-              if (!this.current_deck_ids.includes(data.deck_id)) {
-                this.decks.push({
-                  id: data.deck_id,
-                  name: data.name,
-                  card_count: data.card_count,
-                });
-                this.$emit("input", this.current_deck_ids);
-              }
-            }
-            this.loading = false;
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        this.deck_ids.push(new_deck_id);
       }
     },
 

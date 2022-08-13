@@ -8,19 +8,26 @@
         height="200"
       />
 
-      <decks />
+      <v-card flat class="mx-auto" max-width="1024">
+        <v-card-text>
+          <language-select v-model="language" />
+          <decks-list v-model="deck_ids" />
+        </v-card-text>
+      </v-card>
     </v-container>
   </v-main>
 </template>
 
 <script>
-import Decks from "./Decks.vue";
+import DecksList from "./DecksList.vue";
+import LanguageSelect from "./LanguageSelect.vue";
 
 export default {
   name: "MainView",
 
   components: {
-    Decks,
+    DecksList,
+    LanguageSelect,
   },
 };
 </script>
