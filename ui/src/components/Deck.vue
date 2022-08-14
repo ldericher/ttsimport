@@ -84,7 +84,7 @@ export default {
 
     delete_self() {
       // index in parent vList
-      this.$emit("delete", this.$parent.$children.indexOf(this));
+      this.$emit("delete");
     },
   },
 };
