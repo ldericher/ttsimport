@@ -44,7 +44,6 @@ export default {
 
   methods: {
     new_deck(new_deck_id) {
-      console.log(new_deck_id);
       this.$refs.list.add_deck(new_deck_id);
     },
   },

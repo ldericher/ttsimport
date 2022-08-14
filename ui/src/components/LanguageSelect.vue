@@ -20,8 +20,15 @@ export default {
 
   data: () => ({
     language: "",
+  }),
 
-    languages: [
+  mounted() {
+    this.language = this.value;
+    this.change();
+  },
+
+  computed: {
+    languages: () => [
       { value: "en", text: "English" },
       { value: "fr", text: "French" },
       { value: "de", text: "German" },
@@ -29,15 +36,7 @@ export default {
       { value: "ja", text: "Japanese (tooltips only)" },
       { value: "es", text: "Spanish" },
     ],
-  }),
 
-  mounted() {
-    this.language = this.value;
-
-    this.$emit("input", this.current_language);
-  },
-
-  computed: {
     language_values() {
       var res = [];
 

@@ -1,11 +1,11 @@
 <template>
   <v-list flat v-if="deck_ids.length > 0">
-    <template v-for="(deck_id, idx) in deck_ids">
-      <deck :key="idx" :deck_id="deck_id" :language="language" />
+    <template v-for="(deck_id, index) in deck_ids">
+      <deck :key="index" :deck_id="deck_id" :language="language" />
 
       <v-divider
-        v-if="idx != deck_ids.length - 1"
-        :key="idx + '_div'"
+        v-if="index != deck_ids.length - 1"
+        :key="index + '_div'"
         class="my-2"
         role="presentation"
       />

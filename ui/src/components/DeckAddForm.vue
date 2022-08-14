@@ -13,7 +13,7 @@
           >
           </v-text-field>
 
-          <v-btn color="error" @click="clear" tabindex="-1">
+          <v-btn color="error" @click="$refs.form.reset()" tabindex="-1">
             <v-icon left>mdi-cancel</v-icon>
             Clear
           </v-btn>
@@ -44,10 +44,6 @@ export default {
   }),
 
   methods: {
-    clear() {
-      this.$refs.form.reset();
-    },
-
     add_deck() {
       if (this.deck_id && this.valid) {
         this.$emit("new", this.deck_id);
