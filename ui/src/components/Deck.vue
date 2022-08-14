@@ -63,24 +63,36 @@ export default {
     card_count: null,
   }),
 
-  mounted() {
-    this.$http({
-      method: "POST",
-      url: this.ttsimport_api_baseurl + "/ffdecks/summary",
-      data: { language: this.$root.ttsimport_language, deck_id: this.deck_id },
-    })
-      .then((response) => {
-        this.deck_name = response.data.name;
-        this.card_count = response.data.card_count;
-      })
-      .catch((error) => {
-        console.error(error);
-        this.delete_self();
-      });
+  watch: {
+    deck_id: {
+      immediate: true,
+      handler: "update_deckid",
+    },
   },
 
   methods: {
     download() {},
+
+    update_deckid(new_deck_id) {
+      this.deck_name = null;
+
+      this.$http({
+        method: "POST",
+        url: this.ttsimport_api_baseurl + "/ffdecks/summary",
+        data: {
+          language: this.$root.ttsimport_language,
+          deck_id: new_deck_id,
+        },
+      })
+        .then((response) => {
+          this.deck_name = response.data.name;
+          this.card_count = response.data.card_count;
+        })
+        .catch((error) => {
+          console.error(error);
+          this.delete_self();
+        });
+    },
 
     delete_self() {
       // index in parent vList
