@@ -11,14 +11,19 @@
       <v-card flat class="mx-auto" max-width="1024">
         <v-card-text>
           <language-select v-model="language" />
-          <decks-list v-model="deck_ids" />
+          <decks-list ref="list" :language="language" />
         </v-card-text>
+
+        <v-card-actions>
+          <deck-add-form @new="new_deck" />
+        </v-card-actions>
       </v-card>
     </v-container>
   </v-main>
 </template>
 
 <script>
+import DeckAddForm from "./DeckAddForm.vue";
 import DecksList from "./DecksList.vue";
 import LanguageSelect from "./LanguageSelect.vue";
 
@@ -28,6 +33,18 @@ export default {
   components: {
     DecksList,
     LanguageSelect,
+    DeckAddForm,
+  },
+
+  data: () => ({
+    language: "",
+  }),
+
+  methods: {
+    new_deck(new_deck_id) {
+      console.log(new_deck_id);
+      this.$refs.list.add_deck(new_deck_id);
+    },
   },
 };
 </script>

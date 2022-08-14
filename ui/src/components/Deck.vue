@@ -43,6 +43,7 @@ export default {
 
   props: {
     deck_id: String,
+    language: String,
   },
 
   computed: {
