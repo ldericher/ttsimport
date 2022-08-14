@@ -26,7 +26,7 @@
         Non-Standard deck size!
       </v-tooltip>
 
-      <v-btn @click="delete_deck" color="error" class="ml-2" icon outlined>
+      <v-btn @click="delete_self" color="error" class="ml-2" icon outlined>
         <v-icon>mdi-delete</v-icon>
       </v-btn>
 
@@ -66,7 +66,7 @@ export default {
   methods: {
     download() {},
 
-    delete_deck() {
+    delete_self() {
       // index in parent vList
       this.$emit("delete", this.$parent.$children.indexOf(this));
     },
