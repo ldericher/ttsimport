@@ -6,7 +6,7 @@ import zipfile
 from typing import Iterator, Optional
 
 import fftcgtool
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -35,32 +35,16 @@ def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.Byt
     return mem_file
 
 
-class DecksBody(BaseModel):
+class DeckBody(BaseModel):
     language: Optional[str]
-    deck_ids: list[str]
+    deck_id: str
 
     @property
-    def sanitized_ids(self) -> Iterator[str]:
-        return (
-            deck_id
-            for deck_id in fftcgtool.FFDecks.sanitized_ids(self.deck_ids)
-            if deck_id is not None
-        )
+    def sanitized_id(self) -> Optional[str]:
+        san_id = next(fftcgtool.FFDecks.sanitized_ids([self.deck_id]))
 
-
-class CheckResponse(BaseModel):
-    deck_id: str
-    exists: bool
-
-
-@router.post("/check", response_model=list[CheckResponse])
-async def check_decks(decks_body: DecksBody):
-    return (
-        {
-            "deck_id": deck_id,
-            "exists": fftcgtool.FFDecks.get_deck_data(deck_id) is not None
-        } for deck_id in decks_body.sanitized_ids
-    )
+        if san_id is not None:
+            return san_id
 
 
 class SummaryResponse(BaseModel):
@@ -69,26 +53,29 @@ class SummaryResponse(BaseModel):
     card_count: int
 
 
-@router.post("/summaries", response_model=list[SummaryResponse])
-async def get_deck_names(decks_body: DecksBody):
-    return (
-        {
-            "deck_id": deck_data["description"],
-            "name": deck_data["name"],
-            "card_count": sum(card["count"] for card in deck_data["cards"]),
-        } for deck_id in decks_body.sanitized_ids
-        if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
-    )
+@router.post("/summary", response_model=Optional[SummaryResponse])
+async def get_deck_metadata(deck_body: DeckBody):
+    if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_body.sanitized_id)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No valid deck id received."
+        )
+
+    return {
+        "deck_id": deck_data["description"],
+        "name": deck_data["name"],
+        "card_count": sum(card["count"] for card in deck_data["cards"]),
+    }
 
 
 @router.post("/deck")
-async def get_decks(decks_body: DecksBody):
+async def get_deck(deck_body: DeckBody):
     # sanitize language parameter
-    language = RE_NO_ALPHA.sub("", decks_body.language)
+    language = RE_NO_ALPHA.sub("", deck_body.language)
     language = fftcgtool.Language(language)
 
     # create decks
-    if not (decks := fftcgtool.FFDecks(decks_body.sanitized_ids)):
+    if not (decks := fftcgtool.FFDecks([deck_body.deck_id])):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No valid decks received."
