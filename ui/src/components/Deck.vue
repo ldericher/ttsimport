@@ -9,8 +9,8 @@
       <template v-else> {{ deck_name }} ({{ card_count }} Cards) </template>
     </v-list-item-content>
 
-    <v-list-item-icon v-if="!loading">
-      <v-tooltip left>
+    <v-list-item-icon>
+      <v-tooltip v-if="!loading" left>
         <template v-slot:activator="{ on }">
           <v-btn
             v-if="card_count !== 50"
@@ -26,11 +26,18 @@
         Non-Standard deck size!
       </v-tooltip>
 
-      <v-btn @click="$emit('delete')" color="error" class="ml-2" icon outlined>
+      <v-btn @click="delete_deck" color="error" class="ml-2" icon outlined>
         <v-icon>mdi-delete</v-icon>
       </v-btn>
 
-      <v-btn @click="download" color="success" class="ml-2" icon outlined>
+      <v-btn
+        v-if="!loading"
+        @click="download"
+        color="success"
+        class="ml-2"
+        icon
+        outlined
+      >
         <v-icon>mdi-download</v-icon>
       </v-btn>
     </v-list-item-icon>
@@ -57,8 +64,11 @@ export default {
   }),
 
   methods: {
-    download() {
-      console.log(this.$root.ttsimport_language);
+    download() {},
+
+    delete_deck() {
+      // index in parent vList
+      this.$emit("delete", this.$parent.$children.indexOf(this));
     },
   },
 };

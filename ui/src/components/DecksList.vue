@@ -1,7 +1,7 @@
 <template>
   <v-list flat v-if="deck_ids.length > 0">
     <template v-for="(deck_id, index) in deck_ids">
-      <deck :key="index" :deck_id="deck_id" />
+      <deck :key="index" :deck_id="deck_id" @delete="delete_deck" />
 
       <v-divider
         v-if="index != deck_ids.length - 1"
@@ -33,8 +33,11 @@ export default {
     },
 
     delete_deck(index) {
-      if (index < this.deck_ids.length) {
-        this.deck_ids.splice(index, 1);
+      // Decks have even indices because of dividers
+      let deck_index = index / 2;
+
+      if (deck_index < this.deck_ids.length) {
+        this.deck_ids.splice(deck_index, 1);
       }
     },
   },

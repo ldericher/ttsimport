@@ -11,12 +11,17 @@
             dense
             filled
           >
+            <v-btn
+              slot="append-outer"
+              color="error"
+              @click="$refs.form.reset()"
+              tabindex="-1"
+              icon
+              outlined
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
           </v-text-field>
-
-          <v-btn color="error" @click="$refs.form.reset()" tabindex="-1">
-            <v-icon left>mdi-cancel</v-icon>
-            Clear
-          </v-btn>
 
           <v-btn color="success" type="submit" :disabled="!valid" class="ml-2">
             <v-icon left>mdi-plus</v-icon>
