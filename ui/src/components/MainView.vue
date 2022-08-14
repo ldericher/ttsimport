@@ -10,8 +10,8 @@
 
       <v-card flat class="mx-auto" max-width="1024">
         <v-card-text>
-          <language-select v-model="language" />
-          <decks-list ref="list" :language="language" />
+          <language-select />
+          <decks-list ref="list" />
         </v-card-text>
 
         <v-divider />
@@ -37,10 +37,6 @@ export default {
     LanguageSelect,
     DeckAddForm,
   },
-
-  data: () => ({
-    language: "",
-  }),
 
   methods: {
     new_deck(new_deck_id) {

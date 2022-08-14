@@ -14,16 +14,11 @@
 export default {
   name: "LanguageSelect",
 
-  props: {
-    value: String,
-  },
-
   data: () => ({
     language: "",
   }),
 
   mounted() {
-    this.language = this.value;
     this.change();
   },
 
@@ -58,7 +53,7 @@ export default {
 
   methods: {
     change() {
-      this.$emit("input", this.current_language);
+      this.$root.ttsimport_language = this.current_language;
     },
   },
 };

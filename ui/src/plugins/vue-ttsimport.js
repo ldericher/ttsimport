@@ -13,3 +13,8 @@ Object.defineProperty(Vue.prototype, "ttsimport_api_baseurl", {
     }
   }
 });
+
+Object.defineProperty(Vue.prototype, "ttsimport_language", {
+  value: "",
+  writable: true,
+});

@@ -43,7 +43,6 @@ export default {
 
   props: {
     deck_id: String,
-    language: String,
   },
 
   computed: {
@@ -58,7 +57,9 @@ export default {
   }),
 
   methods: {
-    download() {},
+    download() {
+      console.log(this.$root.ttsimport_language);
+    },
   },
 };
 </script>
