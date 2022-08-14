@@ -62,5 +62,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.noselect {
+  user-select: none;
+}
 </style>

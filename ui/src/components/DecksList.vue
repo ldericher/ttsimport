@@ -96,9 +96,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.noselect {
-  user-select: none;
-}
-</style>
