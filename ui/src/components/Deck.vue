@@ -63,6 +63,22 @@ export default {
     card_count: null,
   }),
 
+  mounted() {
+    this.$http({
+      method: "POST",
+      url: this.ttsimport_api_baseurl + "/ffdecks/summary",
+      data: { language: this.$root.ttsimport_language, deck_id: this.deck_id },
+    })
+      .then((response) => {
+        this.deck_name = response.data.name;
+        this.card_count = response.data.card_count;
+      })
+      .catch((error) => {
+        console.error(error);
+        this.delete_self();
+      });
+  },
+
   methods: {
     download() {},
 
