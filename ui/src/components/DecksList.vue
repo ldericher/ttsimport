@@ -1,5 +1,5 @@
 <template>
-  <v-list flat>
+  <v-list flat v-if="deck_ids.length > 0">
     <template v-for="(deck_id, idx) in deck_ids">
       <deck :key="idx" :deck_id="deck_id" :language="language" />
 

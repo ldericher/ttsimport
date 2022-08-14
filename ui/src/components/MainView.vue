@@ -14,6 +14,8 @@
           <decks-list ref="list" :language="language" />
         </v-card-text>
 
+        <v-divider />
+
         <v-card-actions>
           <deck-add-form @new="new_deck" />
         </v-card-actions>
