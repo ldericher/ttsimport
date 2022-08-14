@@ -71,7 +71,26 @@ export default {
   },
 
   methods: {
-    download() {},
+    download() {
+      // this.$http({
+      //   url: this.ttsimport_api_baseurl + "/ffdecks/deck",
+      //   method: "POST",
+      //   responseType: "blob",
+      //   data: { language: this.language, deck_ids: this.deck_ids },
+      // })
+      //   .then((response) => {
+      //     // save response
+      //     let blob = new Blob([response.data], { type: "application/zip" });
+      //     // redirect to browser
+      //     let link = document.createElement("a");
+      //     link.href = window.URL.createObjectURL(blob);
+      //     link.download = "decks.zip";
+      //     link.click();
+      //   })
+      //   .catch((error) => {
+      //     console.error(error);
+      //   });
+    },
 
     update_deckid(new_deck_id) {
       this.deck_name = null;
