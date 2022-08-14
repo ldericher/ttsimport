@@ -3,18 +3,21 @@ import logging
 import re
 import time
 import zipfile
-from typing import Iterator, Optional
+from typing import Optional
 
-import fftcgtool
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
+from fftcgtool import FFDecks, Language, TTSDeck
 from pydantic import BaseModel
 
 RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
 router = APIRouter(prefix="/ffdecks")
 
 
-def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.BytesIO:
+def pack(
+    decks: list[TTSDeck],
+    language: Language,
+) -> io.BytesIO:
     logger = logging.getLogger(__name__)
 
     # create an in-memory file
@@ -41,7 +44,7 @@ class DeckBody(BaseModel):
 
     @property
     def sanitized_id(self) -> Optional[str]:
-        san_id = next(fftcgtool.FFDecks.sanitized_ids([self.deck_id]))
+        san_id = next(FFDecks.sanitized_ids([self.deck_id]))
 
         if san_id is not None:
             return san_id
@@ -55,7 +58,7 @@ class SummaryResponse(BaseModel):
 
 @router.post("/summary", response_model=Optional[SummaryResponse])
 async def get_deck_metadata(deck_body: DeckBody):
-    if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_body.sanitized_id)) is None:
+    if (deck_data := FFDecks.get_deck_data(deck_body.sanitized_id)) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No valid deck id received."
@@ -72,10 +75,10 @@ async def get_deck_metadata(deck_body: DeckBody):
 async def get_deck(deck_body: DeckBody):
     # sanitize language parameter
     language = RE_NO_ALPHA.sub("", deck_body.language)
-    language = fftcgtool.Language(language)
+    language = Language(language)
 
     # create decks
-    if not (decks := fftcgtool.FFDecks([deck_body.deck_id])):
+    if not (decks := FFDecks([deck_body.deck_id])):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No valid decks received."
