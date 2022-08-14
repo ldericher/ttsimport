@@ -24,7 +24,7 @@ export default {
   },
 
   data: () => ({
-    deck_ids: ["1234", "5678"],
+    deck_ids: [],
   }),
 
   methods: {
