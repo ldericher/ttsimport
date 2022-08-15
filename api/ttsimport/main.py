@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .config import settings, log_config
+from .config import log_config, settings
 from .ffdecks import router as ffdecks_router
 
 dictConfig(log_config.dict())
