@@ -65,7 +65,6 @@ export default {
   data: () => ({
     deck_name: null,
     card_count: null,
-    download_link: null,
   }),
 
   computed: {
@@ -91,12 +90,6 @@ export default {
 
   methods: {
     download() {
-      // check for instant download
-      if (this.download_link !== null) {
-        this.download_link.click();
-        return;
-      }
-
       this.$http({
         url: this.ttsimport_api_baseurl + "/ffdecks/deck",
         method: "POST",
@@ -111,8 +104,8 @@ export default {
           let blob = new Blob([response.data], { type: "application/json" });
 
           // redirect to browser
-          this.download_link = document.createElement("a");
-          this.download_link.href = window.URL.createObjectURL(blob);
+          let link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
 
           // find suggested file name
           let cd_header = response.request.getResponseHeader(
@@ -121,10 +114,10 @@ export default {
           let fn_start_marker = "filename=";
           let suggested_fn_pos =
             cd_header.indexOf(fn_start_marker) + fn_start_marker.length;
-          this.download_link.download = cd_header.substr(suggested_fn_pos);
+          link.download = cd_header.substr(suggested_fn_pos);
 
           // actually download
-          this.download_link.click();
+          link.click();
         })
         .catch((error) => {
           console.error(error);
@@ -136,7 +129,6 @@ export default {
     update_deck_id(new_deck_id) {
       this.deck_name = null;
       this.card_count = null;
-      this.download_link = null;
 
       this.$http({
         method: "POST",
