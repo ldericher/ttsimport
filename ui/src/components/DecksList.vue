@@ -37,6 +37,10 @@ export default {
         this.deck_ids.splice(index, 1);
       }
     },
+
+    clear_decks() {
+      this.deck_ids = [];
+    },
   },
 };
 </script>

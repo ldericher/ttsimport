@@ -17,7 +17,7 @@
         <v-divider />
 
         <v-card-actions>
-          <deck-add-form @new="new_deck" />
+          <deck-add-form @new="new_deck" @clear="clear_decks" />
         </v-card-actions>
       </v-card>
     </v-container>
@@ -41,6 +41,10 @@ export default {
   methods: {
     new_deck(new_deck_id) {
       this.$refs.list.add_deck(new_deck_id);
+    },
+
+    clear_decks() {
+      this.$refs.list.clear_decks();
     },
   },
 };

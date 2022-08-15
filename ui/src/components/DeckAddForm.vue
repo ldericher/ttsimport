@@ -2,7 +2,7 @@
   <v-container>
     <v-form ref="form" @submit.prevent="add_deck" v-model="valid">
       <v-row>
-        <v-col cols="12" align="center" justify="center">
+        <v-col cols="12" class="pb-0">
           <v-text-field
             placeholder="Paste FF Decks Link or ID here"
             hint="e.g. https://ffdecks.com/deck/6272690272862208 or 6272690272862208"
@@ -13,10 +13,21 @@
             filled
           >
           </v-text-field>
+        </v-col>
+      </v-row>
 
-          <v-btn color="success" type="submit" :disabled="!valid" class="ml-2">
+      <v-row>
+        <v-col cols="6" class="pt-0">
+          <v-btn color="error" @click="$emit('clear')" :disabled="!valid">
+            <v-icon left>mdi-close</v-icon>
+            Clear decks list
+          </v-btn>
+        </v-col>
+
+        <v-col cols="6" class="pt-0" align="right" justify="right">
+          <v-btn color="success" type="submit" :disabled="!valid">
             <v-icon left>mdi-check</v-icon>
-            Add Deck
+            Add deck
           </v-btn>
         </v-col>
       </v-row>
