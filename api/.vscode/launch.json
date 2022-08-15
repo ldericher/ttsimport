@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "TTSImport",
+            "name": "TTSImport API",
             "type": "python",
             "request": "launch",
             "module": "ttsimport.main",
