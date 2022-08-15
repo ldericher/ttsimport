@@ -1,16 +1,26 @@
 <template>
   <v-list-item>
     <v-list-item-avatar>
-      <v-icon color="primary">mdi-cards</v-icon>
+      <v-icon :color="failed ? 'error' : 'primary'">mdi-cards</v-icon>
     </v-list-item-avatar>
 
     <v-list-item-content class="noselect">
       <v-progress-linear v-if="loading" indeterminate />
+      <v-alert
+        v-else-if="failed"
+        type="error"
+        class="mb-0"
+        :icon="false"
+        outlined
+        dense
+      >
+        {{ deck_name }} (Deck ID "{{ deck_id }}")
+      </v-alert>
       <template v-else> {{ deck_name }} ({{ card_count }} Cards) </template>
     </v-list-item-content>
 
     <v-list-item-icon>
-      <v-tooltip v-if="!loading" left>
+      <v-tooltip v-if="successful" left>
         <template v-slot:activator="{ on }">
           <v-btn
             v-if="card_count !== 50"
@@ -31,7 +41,7 @@
       </v-btn>
 
       <v-btn
-        v-if="!loading"
+        v-if="successful"
         @click="download"
         color="success"
         class="ml-2"
@@ -52,21 +62,29 @@ export default {
     deck_id: String,
   },
 
-  computed: {
-    loading() {
-      return this.deck_name === null;
-    },
-  },
-
   data: () => ({
     deck_name: null,
     card_count: null,
   }),
 
+  computed: {
+    loading() {
+      return this.deck_name === null;
+    },
+
+    successful() {
+      return !this.loading && this.card_count !== null;
+    },
+
+    failed() {
+      return !(this.loading || this.successful);
+    },
+  },
+
   watch: {
     deck_id: {
       immediate: true,
-      handler: "update_deckid",
+      handler: "update_deck_id",
     },
   },
 
@@ -84,26 +102,31 @@ export default {
         .then((response) => {
           // save response
           let blob = new Blob([response.data], { type: "application/json" });
+
           // redirect to browser
           let link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
 
+          // find suggested file name
           let cd_header = response.request.getResponseHeader(
             "Content-Disposition"
           );
           let fn_start_marker = "filename=";
           let suggested_fn_pos =
             cd_header.indexOf(fn_start_marker) + fn_start_marker.length;
-
           link.download = cd_header.substr(suggested_fn_pos);
+
+          // actually download
           link.click();
         })
         .catch((error) => {
           console.error(error);
+          this.deck_name = "Failed to load JSON for deck, try again";
+          this.card_count = null;
         });
     },
 
-    update_deckid(new_deck_id) {
+    update_deck_id(new_deck_id) {
       this.deck_name = null;
 
       this.$http({
@@ -120,12 +143,12 @@ export default {
         })
         .catch((error) => {
           console.error(error);
-          this.delete_self();
+          this.deck_name = "Failed to load deck";
+          this.card_count = null;
         });
     },
 
     delete_self() {
-      // index in parent vList
       this.$emit("delete");
     },
   },
