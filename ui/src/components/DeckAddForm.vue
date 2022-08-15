@@ -8,23 +8,14 @@
             hint="e.g. https://ffdecks.com/deck/6272690272862208 or 6272690272862208"
             v-model="deck_id"
             :rules="deck_id_rules"
+            clearable
             dense
             filled
           >
-            <v-btn
-              slot="append-outer"
-              color="error"
-              @click="$refs.form.reset()"
-              tabindex="-1"
-              icon
-              outlined
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
           </v-text-field>
 
           <v-btn color="success" type="submit" :disabled="!valid" class="ml-2">
-            <v-icon left>mdi-plus</v-icon>
+            <v-icon left>mdi-check</v-icon>
             Add Deck
           </v-btn>
         </v-col>
