@@ -7,8 +7,8 @@
     :target="href ? '_blank' : ''"
     text
   >
-    <v-icon>{{ icon }}</v-icon>
-    <span class="hidden-sm-and-down ml-2">{{ text }}</span>
+    <v-icon :left="!sm_and_down">{{ icon }}</v-icon>
+    <span class="hidden-sm-and-down">{{ text }}</span>
   </v-btn>
 </template>
 

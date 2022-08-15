@@ -1,66 +1,25 @@
-import io
 import logging
 import re
-import time
-import zipfile
-from typing import Iterator, Optional
+from typing import Optional
 
-import fftcgtool
-from fastapi import APIRouter, status, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, HTTPException, Response, status
+from fftcgtool import FFDecks, Language
 from pydantic import BaseModel
 
 RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
 router = APIRouter(prefix="/ffdecks")
 
 
-def pack(decks: list[fftcgtool.TTSDeck], language: fftcgtool.Language) -> io.BytesIO:
-    logger = logging.getLogger(__name__)
-
-    # create an in-memory file
-    mem_file = io.BytesIO()
-
-    # zip the decks into mem_file
-    with zipfile.ZipFile(mem_file, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-        for deck in decks:
-            # time info
-            data = zipfile.ZipInfo(deck.file_name)
-            data.date_time = time.localtime(time.time())[:6]
-
-            logger.info(f"Saving Deck {deck!r}")
-            zip_file.writestr(deck.file_name, deck.get_json(language))
-
-    # rewind in-memory file before returning
-    mem_file.seek(0)
-    return mem_file
-
-
-class DecksBody(BaseModel):
+class DeckBody(BaseModel):
     language: Optional[str]
-    deck_ids: list[str]
+    deck_id: str
 
     @property
-    def sanitized_ids(self) -> Iterator[str]:
-        return (
-            deck_id
-            for deck_id in fftcgtool.FFDecks.sanitized_ids(self.deck_ids)
-            if deck_id is not None
-        )
+    def sanitized_id(self) -> Optional[str]:
+        san_id = next(FFDecks.sanitized_ids([self.deck_id]))
 
-
-class CheckResponse(BaseModel):
-    deck_id: str
-    exists: bool
-
-
-@router.post("/check", response_model=list[CheckResponse])
-async def check_decks(decks_body: DecksBody):
-    return (
-        {
-            "deck_id": deck_id,
-            "exists": fftcgtool.FFDecks.get_deck_data(deck_id) is not None
-        } for deck_id in decks_body.sanitized_ids
-    )
+        if san_id is not None:
+            return san_id
 
 
 class SummaryResponse(BaseModel):
@@ -69,34 +28,44 @@ class SummaryResponse(BaseModel):
     card_count: int
 
 
-@router.post("/summaries", response_model=list[SummaryResponse])
-async def get_deck_names(decks_body: DecksBody):
-    return (
-        {
-            "deck_id": deck_data["description"],
-            "name": deck_data["name"],
-            "card_count": sum(card["count"] for card in deck_data["cards"]),
-        } for deck_id in decks_body.sanitized_ids
-        if (deck_data := fftcgtool.FFDecks.get_deck_data(deck_id)) is not None
-    )
+@router.post("/summary", response_model=Optional[SummaryResponse])
+async def get_deck_metadata(deck_body: DeckBody):
+    if (deck_data := FFDecks.get_deck_data(deck_body.sanitized_id)) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No valid deck id received."
+        )
+
+    return {
+        "deck_id": deck_data["description"],
+        "name": deck_data["name"],
+        "card_count": sum(card["count"] for card in deck_data["cards"]),
+    }
 
 
 @router.post("/deck")
-async def get_decks(decks_body: DecksBody):
+async def get_deck(deck_body: DeckBody):
+    logger = logging.getLogger(__name__)
+
     # sanitize language parameter
-    language = RE_NO_ALPHA.sub("", decks_body.language)
-    language = fftcgtool.Language(language)
+    language = RE_NO_ALPHA.sub("", deck_body.language)
+    language = Language(language)
 
     # create decks
-    if not (decks := fftcgtool.FFDecks(decks_body.sanitized_ids)):
+    if not (decks := FFDecks([deck_body.deck_id])):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No valid decks received."
         )
 
-    return StreamingResponse(
-        pack(decks, language),
+    deck = decks[0]
+    logger.info(f"Saving Deck {deck!r}")
+
+    return Response(
+        deck.get_json(language),
         status_code=status.HTTP_200_OK,
-        media_type="application/zip",
-        headers={"Content-Disposition": "attachment; filename=decks.zip"},
+        media_type="application/json, text/plain",
+        headers={
+            "Content-Disposition": f"attachment; filename={deck.file_name}"
+        },
     )

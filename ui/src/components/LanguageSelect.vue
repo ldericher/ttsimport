@@ -14,14 +14,16 @@
 export default {
   name: "LanguageSelect",
 
-  props: {
-    value: String,
-  },
-
   data: () => ({
     language: "",
+  }),
 
-    languages: [
+  mounted() {
+    this.change();
+  },
+
+  computed: {
+    languages: () => [
       { value: "en", text: "English" },
       { value: "fr", text: "French" },
       { value: "de", text: "German" },
@@ -29,15 +31,7 @@ export default {
       { value: "ja", text: "Japanese (tooltips only)" },
       { value: "es", text: "Spanish" },
     ],
-  }),
 
-  mounted() {
-    this.language = this.value;
-
-    this.$emit("input", this.current_language);
-  },
-
-  computed: {
     language_values() {
       var res = [];
 
@@ -59,7 +53,7 @@ export default {
 
   methods: {
     change() {
-      this.$emit("input", this.current_language);
+      this.$root.ttsimport_language = this.current_language;
     },
   },
 };

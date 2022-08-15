@@ -2,7 +2,7 @@
   <v-app-bar app color="primary" dark>
     <v-toolbar-title class="noselect">{{ page_title }}</v-toolbar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <icon-text-button
       icon="mdi-github"
