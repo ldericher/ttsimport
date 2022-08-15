@@ -72,24 +72,35 @@ export default {
 
   methods: {
     download() {
-      // this.$http({
-      //   url: this.ttsimport_api_baseurl + "/ffdecks/deck",
-      //   method: "POST",
-      //   responseType: "blob",
-      //   data: { language: this.language, deck_ids: this.deck_ids },
-      // })
-      //   .then((response) => {
-      //     // save response
-      //     let blob = new Blob([response.data], { type: "application/zip" });
-      //     // redirect to browser
-      //     let link = document.createElement("a");
-      //     link.href = window.URL.createObjectURL(blob);
-      //     link.download = "decks.zip";
-      //     link.click();
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
+      this.$http({
+        url: this.ttsimport_api_baseurl + "/ffdecks/deck",
+        method: "POST",
+        responseType: "blob",
+        data: {
+          language: this.$root.ttsimport_language,
+          deck_id: this.deck_id,
+        },
+      })
+        .then((response) => {
+          // save response
+          let blob = new Blob([response.data], { type: "application/json" });
+          // redirect to browser
+          let link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+
+          let cd_header = response.request.getResponseHeader(
+            "Content-Disposition"
+          );
+          let fn_start_marker = "filename=";
+          let suggested_fn_pos =
+            cd_header.indexOf(fn_start_marker) + fn_start_marker.length;
+
+          link.download = cd_header.substr(suggested_fn_pos);
+          link.click();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
     update_deckid(new_deck_id) {

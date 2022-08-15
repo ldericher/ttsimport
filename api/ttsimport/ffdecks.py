@@ -1,41 +1,13 @@
-import io
 import logging
 import re
-import time
-import zipfile
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import StreamingResponse
-from fftcgtool import FFDecks, Language, TTSDeck
+from fastapi import APIRouter, HTTPException, Response, status
+from fftcgtool import FFDecks, Language
 from pydantic import BaseModel
 
 RE_NO_ALPHA = re.compile(r"[^a-z]+", flags=re.UNICODE | re.IGNORECASE)
 router = APIRouter(prefix="/ffdecks")
-
-
-def pack(
-    decks: list[TTSDeck],
-    language: Language,
-) -> io.BytesIO:
-    logger = logging.getLogger(__name__)
-
-    # create an in-memory file
-    mem_file = io.BytesIO()
-
-    # zip the decks into mem_file
-    with zipfile.ZipFile(mem_file, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-        for deck in decks:
-            # time info
-            data = zipfile.ZipInfo(deck.file_name)
-            data.date_time = time.localtime(time.time())[:6]
-
-            logger.info(f"Saving Deck {deck!r}")
-            zip_file.writestr(deck.file_name, deck.get_json(language))
-
-    # rewind in-memory file before returning
-    mem_file.seek(0)
-    return mem_file
 
 
 class DeckBody(BaseModel):
@@ -73,6 +45,8 @@ async def get_deck_metadata(deck_body: DeckBody):
 
 @router.post("/deck")
 async def get_deck(deck_body: DeckBody):
+    logger = logging.getLogger(__name__)
+
     # sanitize language parameter
     language = RE_NO_ALPHA.sub("", deck_body.language)
     language = Language(language)
@@ -84,9 +58,14 @@ async def get_deck(deck_body: DeckBody):
             detail="No valid decks received."
         )
 
-    return StreamingResponse(
-        pack(decks, language),
+    deck = decks[0]
+    logger.info(f"Saving Deck {deck!r}")
+
+    return Response(
+        deck.get_json(language),
         status_code=status.HTTP_200_OK,
-        media_type="application/zip",
-        headers={"Content-Disposition": "attachment; filename=decks.zip"},
+        media_type="application/json, text/plain",
+        headers={
+            "Content-Disposition": f"attachment; filename={deck.file_name}"
+        },
     )
