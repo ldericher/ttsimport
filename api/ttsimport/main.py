@@ -59,6 +59,7 @@ def main():
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
+            expose_headers=["*"],
         )
 
     logger = logging.getLogger(__name__)
