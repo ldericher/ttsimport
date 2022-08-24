@@ -1,21 +1,20 @@
 [tool.poetry]
 authors = ["LDericher <40151420+ldericher@users.noreply.github.com>"]
 description = ""
-include = ["ttsimport/carddb.zip"]
 license = "LICENSE"
-name = "ttsimport"
-version = "0.6.0"
+name = "ttsimport-bot"
+version = "0.6"
 
 [tool.poetry.dependencies]
-aiofiles = "^0.8.0"
-fastapi = "^0.79.0"
+"discord.py" = "^2.0.0"
 fftcgtool = {git = "https://github.com/ldericher/fftcgtool.git", branch = "develop"}
 python = "^3.9"
-uvicorn = "^0.18.2"
+python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
+ttsimport-bot = "ttsimport_bot.main:main"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
