@@ -8,19 +8,6 @@ steps:
   settings:
     repo: ldericher/ttsimport
     auto_tag: true
-    dockerfile: ./Dockerfile
-    username:
-      from_secret: DOCKER_USERNAME
-    password:
-      from_secret: DOCKER_PASSWORD
-
-- name: ttsimport-bot
-  image: plugins/docker
-  settings:
-    repo: ldericher/ttsimport-bot
-    auto_tag: true
-    context: ./bot
-    dockerfile: ./bot/Dockerfile
     username:
       from_secret: DOCKER_USERNAME
     password:
