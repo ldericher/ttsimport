@@ -8,7 +8,6 @@ steps:
   settings:
     repo: ldericher/ttsimport
     auto_tag: true
-    dockerfile: ./Dockerfile
     username:
       from_secret: DOCKER_USERNAME
     password:
