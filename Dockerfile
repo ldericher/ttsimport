@@ -2,7 +2,7 @@
 # build ui #
 ############
 
-FROM node:lts-alpine AS build-ui
+FROM node:16-alpine AS build-ui
 
 # some dir for our code
 WORKDIR /app
